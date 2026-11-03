@@ -5,114 +5,266 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#081323">
+
 <title>App Together</title>
 
+<!-- Telegram Web App -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <!-- Monetag SDK -->
-<script src="//libtl.com/sdk.js"
-data-zone="12181496"
-data-sdk="show_12181496"></script>
+<script
+    src="//libtl.com/sdk.js"
+    data-zone="12181496"
+    data-sdk="show_12181496">
+</script>
 
 <style>
-*{box-sizing:border-box}
-body{
-margin:0;
-background:#081323;
-color:white;
-font-family:Arial,sans-serif;
-text-align:center;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
+* {
+    box-sizing: border-box;
 }
-.container{
-width:90%;
-max-width:400px;
+
+body {
+    margin: 0;
+    background: #081323;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-h1{font-size:32px;margin-bottom:12px}
-p{color:#b8c5d8}
-button{
-width:100%;
-padding:17px;
-margin-top:20px;
-border:0;
-border-radius:14px;
-background:#18b981;
-color:white;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+
+.container {
+    width: 90%;
+    max-width: 400px;
 }
-button:disabled{opacity:.6}
-.page{display:none}
-#page1{display:block}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+p {
+    color: #b8c5d8;
+}
+
+button {
+    width: 100%;
+    padding: 17px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 14px;
+    background: #18b981;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.page {
+    display: none;
+}
+
+#page1 {
+    display: block;
+}
+
+#status {
+    min-height: 24px;
+    margin-top: 15px;
+    color: #b8c5d8;
+    font-size: 14px;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<div class="page" id="page1">
-<h1>App Together</h1>
-<p>أهلاً بيك في تطبيقنا ❤️</p>
-<button onclick="showPage('page2')">ابدأ</button>
-</div>
+    <!-- الصفحة الأولى -->
+    <div class="page" id="page1">
 
-<div class="page" id="page2">
-<h1>App Together</h1>
-<button id="adButton1" onclick="watchAd('adButton1','page3')">
-إضغط لمشاهدة الإعلان
-</button>
-</div>
+        <h1>App Together</h1>
 
-<div class="page" id="page3">
-<h1>App Together</h1>
-<button id="adButton2" onclick="watchAd('adButton2',null)">
-إضغط لمشاهدة الإعلان
-</button>
-<button onclick="showPage('page2')">السابق</button>
-</div>
+        <p>أهلاً بيك في تطبيقنا ❤️</p>
+
+        <button onclick="showPage('page2')">
+            ابدأ
+        </button>
+
+    </div>
+
+    <!-- الصفحة الثانية -->
+    <div class="page" id="page2">
+
+        <h1>App Together</h1>
+
+        <p>شاهد الإعلان للحصول على المكافأة ❤️</p>
+
+        <button
+            id="adButton1"
+            onclick="watchAd('adButton1','page3')">
+
+            إضغط لمشاهدة الإعلان
+
+        </button>
+
+    </div>
+
+    <!-- الصفحة الثالثة -->
+    <div class="page" id="page3">
+
+        <h1>App Together</h1>
+
+        <p>أكمل الإعلان للحصول على المكافأة ❤️</p>
+
+        <button
+            id="adButton2"
+            onclick="watchAd('adButton2',null)">
+
+            إضغط لمشاهدة الإعلان
+
+        </button>
+
+        <button onclick="showPage('page2')">
+            السابق
+        </button>
+
+    </div>
+
+    <div id="status"></div>
 
 </div>
 
 <script>
+
+// Telegram initialization
 const tg = window.Telegram?.WebApp;
-if(tg){
-tg.ready();
-tg.expand();
+
+if (tg) {
+    tg.ready();
+    tg.expand();
 }
 
-function showPage(id){
-document.querySelectorAll('.page').forEach(p=>{
-p.style.display='none';
-});
-document.getElementById(id).style.display='block';
+// منع تشغيل أكثر من إعلان في نفس الوقت
+let adInProgress = false;
+
+// عداد لإنشاء معرف مختلف لكل مشاهدة
+let adCounter = 0;
+
+
+// التنقل بين الصفحات
+function showPage(id) {
+
+    document.querySelectorAll('.page').forEach(page => {
+        page.style.display = 'none';
+    });
+
+    const target = document.getElementById(id);
+
+    if (target) {
+        target.style.display = 'block';
+    }
+
 }
 
-function watchAd(buttonId,nextPage){
-const btn=document.getElementById(buttonId);
 
-if(typeof window.show_12181496 !== 'function'){
-alert('الإعلان لم يتم تحميله. حاول مرة أخرى.');
-return;
+// عرض الرسائل
+function setStatus(message) {
+
+    document.getElementById('status').textContent = message;
+
 }
 
-btn.disabled=true;
 
-window.show_12181496()
-.then(()=>{
-alert('شكراً لمشاهدة الإعلان ❤️');
-if(nextPage) showPage(nextPage);
-})
-.catch(()=>{
-alert('لم يكتمل عرض الإعلان. حاول مرة أخرى.');
-})
-.finally(()=>{
-btn.disabled=false;
-});
+// مشاهدة الإعلان
+async function watchAd(buttonId, nextPage) {
+
+    const btn = document.getElementById(buttonId);
+
+    // منع الضغط المتكرر
+    if (adInProgress) {
+        return;
+    }
+
+    // التأكد من تحميل Monetag
+    if (typeof window.show_12181496 !== 'function') {
+
+        setStatus('الإعلان لم يتم تحميله. حاول مرة أخرى.');
+
+        return;
+    }
+
+    adInProgress = true;
+    btn.disabled = true;
+
+    setStatus('جاري تحميل الإعلان...');
+
+    // معرف فريد لكل محاولة
+    const ymid = 'app-together-' +
+                 Date.now() + '-' +
+                 (++adCounter);
+
+    try {
+
+        // عرض الإعلان وانتظار تأكيد Monetag
+        const result = await window.show_12181496({
+            ymid: ymid,
+            requestVar: buttonId
+        });
+
+        // لا نعتبر الإعلان مكتملاً إلا بعد التأكيد
+        if (result?.reward_event_type === 'valued') {
+
+            setStatus('تم تأكيد مشاهدة الإعلان بنجاح ❤️');
+
+            alert('شكراً لك ❤️ تم إكمال الإعلان بنجاح');
+
+            // الانتقال للصفحة التالية عند النجاح فقط
+            if (nextPage) {
+                showPage(nextPage);
+            }
+
+        } else {
+
+            // لا رسالة شكر ولا مكافأة عند عدم التأكيد
+            setStatus('لم يتم تأكيد إكمال الإعلان.');
+
+            alert(
+                'لم يتم تأكيد إكمال الإعلان ❤️\n' +
+                'أكمل الإعلان وحاول مرة أخرى.'
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error('Monetag error:', error);
+
+        setStatus('تعذر التحقق من الإعلان.');
+
+        alert(
+            'لم يتم تأكيد مشاهدة الإعلان.\n' +
+            'تأكد من اتصال الإنترنت وحاول مرة أخرى.'
+        );
+
+    } finally {
+
+        // إعادة تفعيل الزر
+        adInProgress = false;
+        btn.disabled = false;
+
+    }
+
 }
+
 </script>
 
 </body>
