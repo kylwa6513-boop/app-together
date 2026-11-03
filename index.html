@@ -111,134 +111,203 @@ input{
 </div>
 
 <script>
-const tg = window.Telegram?.WebApp;
 
-if(tg){
- tg.ready();
- tg.expand();
-}
+const tg = window.Telegram?.WebApp;
+const API_URL = "https://sqtnsimqusjmkgutocvm.supabase.co/functions/v1/ton-mining";
+
+// ضع Supabase anon public key هنا
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
 const DURATION = 12 * 60 * 60 * 1000;
 const REWARD = 0.0000595;
 
-let balance = Number(localStorage.getItem("ton_balance") || 0);
-let cycles = Number(localStorage.getItem("ton_cycles") || 0);
+let profile = null;
+let completing = false;
 let ads = Number(localStorage.getItem("ton_ads") || 0);
-let start = Number(localStorage.getItem("ton_start") || 0);
 let wallet = localStorage.getItem("ton_wallet") || "";
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
 
 document.getElementById("wallet").value = wallet;
 
-function saveData(){
- localStorage.setItem("ton_balance",balance);
- localStorage.setItem("ton_cycles",cycles);
- localStorage.setItem("ton_ads",ads);
- localStorage.setItem("ton_start",start);
-}
-
-function update(){
- document.getElementById("balance").textContent =
- balance.toFixed(9)+" TON";
-
- document.getElementById("cycles").textContent=cycles;
- document.getElementById("ads").textContent=ads;
-}
-
-function startMining(){
- if(start){
-  alert("لديك دورة تعدين قيد التشغيل بالفعل");
-  return;
- }
-
- start=Date.now();
- saveData();
- updateTimer();
-}
-
-function completeMining(){
- // إنهاء الدورة قبل إضافة المكافأة لمنع تكرارها
- start=0;
- balance+=REWARD;
- cycles++;
-
- saveData();
- update();
-
- document.getElementById("timer").textContent="00:00:00";
- document.getElementById("status").textContent=
- "🎉 اكتملت الدورة! تمت إضافة المكافأة التجريبية";
-
- const button=document.getElementById("mineButton");
- button.disabled=false;
- button.textContent="ابدأ دورة جديدة";
-}
-
-function updateTimer(){
- const timer=document.getElementById("timer");
- const button=document.getElementById("mineButton");
- const status=document.getElementById("status");
-
- if(!start){
-  if(cycles>0){
-   timer.textContent="00:00:00";
-   status.textContent="🎉 مكافأتك السابقة اكتملت! يمكنك بدء دورة جديدة";
-   button.textContent="ابدأ دورة جديدة";
-  }else{
-   timer.textContent="12:00:00";
-   status.textContent="ابدأ التعدين واجمع مكافأتك بعد 12 ساعة";
-   button.textContent="ابدأ التعدين";
+async function api(action) {
+  if (!tg?.initData) {
+    throw new Error("افتح التطبيق من داخل بوت Telegram");
   }
 
-  button.disabled=false;
-  return;
- }
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({
+      action,
+      initData: tg.initData
+    })
+  });
 
- const remaining=DURATION-(Date.now()-start);
+  const data = await response.json();
 
- if(remaining<=0){
-  completeMining();
-  return;
- }
+  if (!response.ok || data.error) {
+    throw new Error(data.error || "حدث خطأ في الاتصال");
+  }
 
- const hours=Math.floor(remaining/3600000);
- const minutes=Math.floor((remaining%3600000)/60000);
- const seconds=Math.floor((remaining%60000)/1000);
-
- timer.textContent=
- String(hours).padStart(2,"0")+":"+
- String(minutes).padStart(2,"0")+":"+
- String(seconds).padStart(2,"0");
-
- button.disabled=true;
- button.textContent="التعدين جارٍ...";
- status.textContent="⛏️ التعدين مستمر، انتظر اكتمال الوقت";
+  return data;
 }
 
-function watchAd(){
- alert("الإعلانات لم تُربط بعد. لا توجد مكافأة فعلية قبل التحقق من مشاهدة إعلان حقيقي.");
+function update() {
+  if (!profile) return;
+
+  document.getElementById("balance").textContent =
+    Number(profile.Balance || 0).toFixed(9) + " TON";
+
+  document.getElementById("cycles").textContent =
+    profile["Mining-cycles"] || 0;
+
+  document.getElementById("ads").textContent = ads;
 }
 
-function saveWallet(){
- wallet=document.getElementById("wallet").value.trim();
+async function loadProfile() {
+  try {
+    document.getElementById("status").textContent =
+      "جاري تحميل حسابك...";
 
- if(!wallet){
-  alert("من فضلك أدخل عنوان المحفظة");
-  return;
- }
+    const data = await api("status");
 
- localStorage.setItem("ton_wallet",wallet);
+    if (data.status !== "ok") {
+      throw new Error("حسابك غير موجود في قاعدة البيانات");
+    }
 
- document.getElementById("walletStatus").textContent=
- "تم حفظ العنوان تجريبيًا على هذا الجهاز";
+    profile = data.profile;
+    update();
+    updateTimer();
+
+  } catch (error) {
+    document.getElementById("status").textContent =
+      error.message;
+  }
 }
 
-function withdraw(){
- alert("السحب غير متاح حاليًا. سيتم تفعيله بعد ربط الخادم ومحفظة TON.");
+async function startMining() {
+  try {
+    const button = document.getElementById("mineButton");
+    button.disabled = true;
+
+    const result = await api("start");
+
+    if (
+      result.status !== "started" &&
+      result.status !== "already_running"
+    ) {
+      throw new Error("تعذر بدء التعدين");
+    }
+
+    await loadProfile();
+
+  } catch (error) {
+    alert(error.message);
+    document.getElementById("mineButton").disabled = false;
+  }
 }
 
-update();
-updateTimer();
-setInterval(updateTimer,1000);
-</script>
-</body>
-</html>
+async function completeMining() {
+  if (completing) return;
+
+  completing = true;
+
+  try {
+    document.getElementById("status").textContent =
+      "جاري التحقق من اكتمال التعدين...";
+
+    const result = await api("complete");
+
+    if (result.status === "completed") {
+      await loadProfile();
+      alert("🎉 تمت إضافة مكافأة التعدين التجريبية!");
+    } else {
+      await loadProfile();
+    }
+
+  } catch (error) {
+    document.getElementById("status").textContent =
+      error.message;
+  } finally {
+    completing = false;
+    updateTimer();
+  }
+}
+
+function updateTimer() {
+  const timer = document.getElementById("timer");
+  const button = document.getElementById("mineButton");
+  const status = document.getElementById("status");
+
+  if (!profile) {
+    button.disabled = true;
+    return;
+  }
+
+  const startedAt = profile["Mining started at"];
+
+  if (!startedAt) {
+    timer.textContent = "12:00:00";
+    status.textContent = "ابدأ التعدين واجمع مكافأتك بعد 12 ساعة";
+    button.textContent = "ابدأ التعدين";
+    button.disabled = false;
+    return;
+  }
+
+  const remaining =
+    DURATION - (Date.now() - Date.parse(startedAt));
+
+  if (remaining <= 0) {
+    timer.textContent = "00:00:00";
+    button.disabled = true;
+    button.textContent = "جاري استلام المكافأة...";
+    status.textContent = "اكتمل الوقت، جاري التحقق";
+    completeMining();
+    return;
+  }
+
+  const hours = Math.floor(remaining / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+
+  timer.textContent =
+    String(hours).padStart(2, "0") + ":" +
+    String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+
+  status.textContent = "⛏️ التعدين مستمر...";
+  button.disabled = true;
+  button.textContent = "التعدين جارٍ...";
+}
+
+function watchAd() {
+  alert("الإعلانات لم تُربط بعد. لن تتم إضافة مكافأة قبل التحقق من الإعلان.");
+}
+
+function saveWallet() {
+  wallet = document.getElementById("wallet").value.trim();
+
+  if (!wallet) {
+    alert("أدخل عنوان محفظة TON");
+    return;
+  }
+
+  localStorage.setItem("ton_wallet", wallet);
+
+  document.getElementById("walletStatus").textContent =
+    "تم حفظ عنوان المحفظة على هذا الجهاز";
+}
+
+function withdraw() {
+  alert("السحب غير متاح حاليًا.");
+}
+
+loadProfile();
+setInterval(updateTimer, 1000);
