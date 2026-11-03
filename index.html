@@ -2,585 +2,212 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#081323">
-  <title>App Together - TON Mining</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#081323">
+<title>App Together</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 20px 15px;
-      background: #081323;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    .container {
-      max-width: 460px;
-      margin: auto;
-    }
-
-    .header {
-      margin: 15px 0 25px;
-    }
-
-    .logo {
-      font-size: 29px;
-      font-weight: bold;
-      color: #42c9ff;
-      letter-spacing: 1px;
-    }
-
-    .subtitle {
-      color: #9aabc2;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .card {
-      background: #11233b;
-      border: 1px solid #203b5d;
-      border-radius: 18px;
-      padding: 22px;
-      margin-bottom: 15px;
-    }
-
-    .balance-label {
-      color: #a9bad0;
-      font-size: 15px;
-    }
-
-    .balance {
-      color: #42c9ff;
-      font-size: 35px;
-      font-weight: bold;
-      margin: 12px 0;
-      direction: ltr;
-    }
-
-    .unit {
-      color: #a9bad0;
-      font-size: 14px;
-    }
-
-    .status {
-      color: #42c9ff;
-      font-size: 14px;
-      margin: 12px 0;
-    }
-
-    .timer {
-      font-size: 25px;
-      font-weight: bold;
-      direction: ltr;
-      margin: 15px 0;
-    }
-
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 13px;
-      padding: 15px;
-      margin-top: 10px;
-      background: #159bd3;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    .secondary {
-      background: #203b5d;
-    }
-
-    .green {
-      background: #168b65;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .stat {
-      background: #0b1a2d;
-      border-radius: 12px;
-      padding: 15px 8px;
-    }
-
-    .stat-number {
-      color: #42c9ff;
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .stat-label {
-      color: #a9bad0;
-      font-size: 12px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #29496d;
-      background: #081323;
-      color: white;
-      margin-top: 12px;
-      text-align: left;
-      direction: ltr;
-      outline: none;
-    }
-
-    .note {
-      color: #91a4bd;
-      font-size: 12px;
-      line-height: 1.8;
-      margin-top: 15px;
-    }
-
-    .message {
-      color: #ffd166;
-      font-size: 13px;
-      margin-top: 12px;
-      line-height: 1.6;
-    }
-
-    .error {
-      color: #ff7777;
-    }
-
-    .footer {
-      color: #60758e;
-      font-size: 12px;
-      margin: 25px 0 10px;
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#081323;
+  color:white;
+  font-family:Arial,sans-serif;
+  text-align:center;
+}
+header{
+  padding:25px 15px;
+  background:#102641;
+  border-bottom:1px solid #25415f;
+}
+.logo{
+  color:#42c9ff;
+  font-size:27px;
+  font-weight:bold;
+}
+header p{color:#a9bad0;font-size:13px}
+.container{max-width:460px;margin:auto;padding:20px 15px}
+.page{display:none}
+.page.active{display:block}
+.card{
+  background:#11233b;
+  border:1px solid #203b5d;
+  border-radius:18px;
+  padding:25px 18px;
+  margin-bottom:17px;
+}
+h2{color:#42c9ff}
+p{color:#b5c6da;line-height:1.8}
+button{
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  width:100%;
+  margin:8px 0;
+  color:white;
+  background:#159bd3;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:active{transform:scale(.98)}
+.secondary{background:#203b5d}
+.ad-slot{
+  min-height:180px;
+  border:2px dashed #41617f;
+  border-radius:14px;
+  margin:20px 0;
+  padding:20px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#91a8c1;
+  line-height:1.8;
+}
+.message{
+  color:#ffd166;
+  font-size:13px;
+  line-height:1.7;
+}
+nav{
+  position:sticky;
+  bottom:0;
+  background:#102641;
+  display:flex;
+  justify-content:space-around;
+  padding:12px 5px;
+  border-top:1px solid #25415f;
+}
+nav button{
+  width:32%;
+  margin:0;
+  padding:12px 5px;
+  font-size:13px;
+  background:#203b5d;
+}
+nav button.selected{background:#159bd3}
+footer{
+  color:#71869e;
+  font-size:12px;
+  padding:20px;
+}
+</style>
 </head>
 
 <body>
+
+<header>
+  <div class="logo">APP TOGETHER 🚀</div>
+  <p>استمتع بالإعلانات وكن جزءًا من مجتمعنا</p>
+</header>
+
 <div class="container">
 
-  <div class="header">
-    <div class="logo">APP TOGETHER</div>
-    <div class="subtitle">Together We Grow 🚀</div>
-  </div>
-
-  <div class="card">
-    <div class="balance-label">رصيدك التجريبي</div>
-    <div class="balance" id="balance">0.00000000</div>
-    <div class="unit">TON</div>
-
-    <div class="status" id="status">جاري الاتصال...</div>
-
-    <div class="timer" id="timer">12:00:00</div>
-
-    <button id="mineButton" disabled>
-      جاري تحميل الحساب...
-    </button>
-
-    <div class="message" id="mainMessage"></div>
-  </div>
-
-  <div class="card">
-    <h3>📊 إحصائياتك</h3>
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-number" id="cycles">0</div>
-        <div class="stat-label">دورات مكتملة</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-number" id="ads">0</div>
-        <div class="stat-label">الإعلانات المشاهدة</div>
-      </div>
+  <!-- الصفحة الرئيسية -->
+  <section class="page active" id="home">
+    <div class="card">
+      <h2>أهلاً بيك في App Together ❤️</h2>
+      <p>
+        أهلاً بيك في تطبيقنا!
+        تقدر تدخل صفحات الإعلانات من هنا.
+      </p>
+      <button onclick="showPage('ad1')">
+        🎬 الإعلان الأول
+      </button>
+      <button onclick="showPage('ad2')">
+        🎬 الإعلان الثاني
+      </button>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h3>🎬 الإعلانات</h3>
-    <p class="note">
-      شاهد الإعلانات بعد تفعيل شبكة الإعلانات وربطها بالتطبيق.
-    </p>
-    <button class="green" id="adButton">
-      مشاهدة إعلان
+  <!-- صفحة الإعلان الأول -->
+  <section class="page" id="ad1">
+    <div class="card">
+      <h2>🎧 الإعلان الأول</h2>
+      <p>اضغط لمشاهدة الإعلان.</p>
+
+      <div class="ad-slot" id="ad-slot-1">
+        مكان الإعلان الأول<br>
+        سيتم عرض الإعلان هنا بعد إضافة كود Monetag
+      </div>
+
+      <button onclick="adNotice()">
+        ▶ إضغط لمشاهدة الإعلان
+      </button>
+
+      <div class="message" id="message1"></div>
+    </div>
+    <button class="secondary" onclick="showPage('home')">
+      العودة للرئيسية
     </button>
-    <div class="message" id="adMessage"></div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h3>👛 محفظة TON</h3>
-    <input
-      id="wallet"
-      type="text"
-      placeholder="أدخل عنوان محفظة TON"
-      autocomplete="off"
-    >
-    <button class="secondary" id="saveWallet">
-      حفظ عنوان المحفظة
+  <!-- صفحة الإعلان الثاني -->
+  <section class="page" id="ad2">
+    <div class="card">
+      <h2>🎧 الإعلان الثاني</h2>
+      <p>اضغط لمشاهدة الإعلان.</p>
+
+      <div class="ad-slot" id="ad-slot-2">
+        مكان الإعلان الثاني<br>
+        سيتم عرض الإعلان هنا بعد إضافة كود Monetag
+      </div>
+
+      <button onclick="adNotice()">
+        ▶ إضغط لمشاهدة الإعلان
+      </button>
+
+      <div class="message" id="message2"></div>
+    </div>
+    <button class="secondary" onclick="showPage('home')">
+      العودة للرئيسية
     </button>
-    <div class="message" id="walletMessage"></div>
-
-    <p class="note">
-      حفظ العنوان لا يعني أن السحب متاح. لا توجد مدفوعات حقيقية مفعّلة حاليًا.
-    </p>
-  </div>
-
-  <div class="footer">
-    App Together © 2026
-    <br>
-    نظام تجريبي للمكافآت وليس تعدين TON حقيقيًا.
-  </div>
+  </section>
 
 </div>
 
+<nav>
+  <button id="nav-home" class="selected"
+    onclick="showPage('home')">🏠 الرئيسية</button>
+  <button id="nav-ad1"
+    onclick="showPage('ad1')">🎬 إعلان 1</button>
+  <button id="nav-ad2"
+    onclick="showPage('ad2')">🎬 إعلان 2</button>
+</nav>
+
+<footer>
+  App Together © 2026
+</footer>
+
 <script>
-"use strict";
-
-/* إعدادات الاتصال */
-const API_URL =
-  "https://sqtnsimqusjmkgutocvm.supabase.co/functions/v1/ton-mining";
-
-/* ضع مفتاح Supabase العام هنا */
-const SUPABASE_ANON_KEY = "sb_publishable_g1rWdUnCyy7tOUs3CyHm1A_aX_BYpeN";
-
-const REWARD = 0.0000595;
-const CYCLE_TIME = 12 * 60 * 60 * 1000;
-
-const tg = window.Telegram?.WebApp;
-
-let profile = null;
-let busy = false;
-let completing = false;
-let completedAttempted = false;
-
-/* عناصر الصفحة */
-const balanceEl = document.getElementById("balance");
-const statusEl = document.getElementById("status");
-const timerEl = document.getElementById("timer");
-const mineButton = document.getElementById("mineButton");
-const cyclesEl = document.getElementById("cycles");
-const mainMessage = document.getElementById("mainMessage");
-
-/* تهيئة تيليجرام */
-if (tg) {
-  tg.ready();
-  tg.expand();
+if(window.Telegram && window.Telegram.WebApp){
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
 }
 
-/* عرض الرسائل */
-function showMessage(element, message, isError = false) {
-  element.textContent = message;
-  element.className = isError
-    ? "message error"
-    : "message";
-}
-
-/* الاتصال بالسيرفر */
-async function api(action) {
-  if (!tg || !tg.initData) {
-    throw new Error("افتح التطبيق من داخل بوت تيليجرام.");
-  }
-
-  if (
-    !SUPABASE_ANON_KEY ||
-    SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY"
-  ) {
-    throw new Error("مفتاح Supabase العام غير موجود في الكود.");
-  }
-
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_ANON_KEY,
-      "Authorization": "Bearer " + SUPABASE_ANON_KEY
-    },
-    body: JSON.stringify({
-      action: action,
-      initData: tg.initData
-    })
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(page=>{
+    page.classList.remove('active');
   });
 
-  const result = await response.json().catch(() => ({}));
+  document.getElementById(pageId).classList.add('active');
 
-  if (!response.ok) {
-    throw new Error(
-      result.error || result.message ||
-      "فشل الاتصال بالسيرفر. رمز الخطأ: " + response.status
-    );
-  }
+  document.querySelectorAll('nav button').forEach(btn=>{
+    btn.classList.remove('selected');
+  });
 
-  if (result.error) {
-    throw new Error(result.error);
-  }
+  document.getElementById('nav-'+pageId)
+    .classList.add('selected');
 
-  return result;
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* قراءة بيانات الحساب */
-function getProfileFromResult(result) {
-  return result.profile || result.data?.profile || null;
+function adNotice(){
+  alert('الإعلانات لم يتم ربطها بعد. أضف كود Monetag أولاً.');
 }
-
-/* تحديث الرصيد */
-function updateBalance() {
-  if (!profile) return;
-
-  const balance = Number(profile.Balance || 0);
-  balanceEl.textContent = balance.toFixed(8);
-
-  cyclesEl.textContent =
-    Number(profile["Mining-cycles"] || 0);
-}
-
-/* تحميل الحساب */
-async function loadProfile() {
-  mineButton.disabled = true;
-  mineButton.textContent = "جاري تحميل الحساب...";
-  statusEl.textContent = "جاري الاتصال بالسيرفر...";
-  showMessage(mainMessage, "");
-
-  try {
-    const result = await api("status");
-
-    if (result.status !== "ok") {
-      throw new Error(
-        result.message ||
-        "الحساب غير موجود في جدول profiles."
-      );
-    }
-
-    profile = getProfileFromResult(result);
-
-    if (!profile) {
-      throw new Error("السيرفر لم يرجع بيانات الحساب.");
-    }
-
-    updateBalance();
-    updateTimer();
-
-  } catch (error) {
-    profile = null;
-    statusEl.textContent = "تعذر تحميل الحساب";
-    mineButton.textContent = "إعادة المحاولة";
-    mineButton.disabled = false;
-
-    showMessage(
-      mainMessage,
-      error.message,
-      true
-    );
-
-    mineButton.onclick = () => loadProfile();
-  }
-}
-
-/* بدء دورة التعدين */
-async function startMining() {
-  if (busy || !profile) return;
-
-  busy = true;
-  mineButton.disabled = true;
-  mineButton.textContent = "جاري بدء التعدين...";
-
-  try {
-    const result = await api("start");
-
-    const data = result.data || result;
-
-    if (
-      data.status === "started" ||
-      data.status === "already_running"
-    ) {
-      showMessage(
-        mainMessage,
-        data.status === "started"
-          ? "بدأت دورة التعدين بنجاح 🚀"
-          : "لديك دورة تعدين قيد التشغيل بالفعل."
-      );
-
-      await loadProfile();
-
-    } else {
-      throw new Error(
-        data.message ||
-        data.status ||
-        "لم نتمكن من بدء التعدين."
-      );
-    }
-
-  } catch (error) {
-    showMessage(mainMessage, error.message, true);
-    mineButton.disabled = false;
-    mineButton.textContent = "حاول مرة أخرى";
-  } finally {
-    busy = false;
-    updateTimer();
-  }
-}
-
-/* إنهاء الدورة وإضافة المكافأة */
-async function completeMining() {
-  if (busy || completing || !profile) return;
-
-  completing = true;
-  busy = true;
-  mineButton.disabled = true;
-  mineButton.textContent = "جاري إضافة المكافأة...";
-
-  try {
-    const result = await api("complete");
-    const data = result.data || result;
-
-    if (data.status === "completed") {
-      completedAttempted = false;
-
-      showMessage(
-        mainMessage,
-        "اكتملت الدورة وتم تحديث رصيدك بنجاح 🎉"
-      );
-
-      await loadProfile();
-
-    } else {
-      throw new Error(
-        data.message ||
-        data.status ||
-        "لم تكتمل الدورة."
-      );
-    }
-
-  } catch (error) {
-    showMessage(mainMessage, error.message, true);
-    mineButton.disabled = false;
-    mineButton.textContent = "إعادة محاولة استلام المكافأة";
-  } finally {
-    completing = false;
-    busy = false;
-    updateTimer();
-  }
-}
-
-/* حساب الوقت المتبقي */
-function updateTimer() {
-  if (!profile) return;
-
-  const startedAt = profile["Mining started at"];
-
-  if (!startedAt) {
-    timerEl.textContent = "12:00:00";
-    statusEl.textContent = "جاهز لبدء دورة جديدة";
-    mineButton.textContent = "🚀 ابدأ التعدين";
-    mineButton.disabled = busy;
-    mineButton.onclick = startMining;
-    completedAttempted = false;
-    return;
-  }
-
-  const startTime = new Date(startedAt).getTime();
-
-  if (!Number.isFinite(startTime)) {
-    statusEl.textContent = "تاريخ بدء الدورة غير صحيح";
-    mineButton.disabled = true;
-    return;
-  }
-
-  const remaining = CYCLE_TIME - (Date.now() - startTime);
-
-  if (remaining <= 0) {
-    timerEl.textContent = "00:00:00";
-    statusEl.textContent = "اكتملت مدة الدورة";
-
-    mineButton.textContent = "استلام المكافأة";
-    mineButton.onclick = completeMining;
-    mineButton.disabled = busy;
-
-    if (!completedAttempted && !busy) {
-      completedAttempted = true;
-      completeMining();
-    }
-
-    return;
-  }
-
-  const hours = Math.floor(remaining / 3600000);
-  const minutes = Math.floor((remaining % 3600000) / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-
-  timerEl.textContent =
-    String(hours).padStart(2, "0") + ":" +
-    String(minutes).padStart(2, "0") + ":" +
-    String(seconds).padStart(2, "0");
-
-  statusEl.textContent = "التعدين قيد التشغيل ⛏️";
-  mineButton.textContent = "التعدين يعمل...";
-  mineButton.disabled = true;
-}
-
-/* زر الإعلانات */
-document.getElementById("adButton").addEventListener("click", () => {
-  showMessage(
-    document.getElementById("adMessage"),
-    "الإعلانات لم يتم ربطها بعد. نحتاج كود وحدة Monetag الخاصة بك."
-  );
-});
-
-/* حفظ المحفظة محليًا */
-const walletInput = document.getElementById("wallet");
-
-walletInput.value =
-  localStorage.getItem("app_together_wallet") || "";
-
-document.getElementById("saveWallet").addEventListener("click", () => {
-  const wallet = walletInput.value.trim();
-
-  if (!wallet) {
-    showMessage(
-      document.getElementById("walletMessage"),
-      "اكتب عنوان المحفظة أولًا.",
-      true
-    );
-    return;
-  }
-
-  localStorage.setItem("app_together_wallet", wallet);
-
-  showMessage(
-    document.getElementById("walletMessage"),
-    "تم حفظ عنوان المحفظة على هذا الجهاز."
-  );
-});
-
-/* عدد الإعلانات المحفوظ محليًا */
-document.getElementById("ads").textContent =
-  localStorage.getItem("app_together_ads") || "0";
-
-/* تشغيل التطبيق */
-mineButton.addEventListener("click", () => {
-  if (!profile) {
-    loadProfile();
-  } else {
-    startMining();
-  }
-});
-
-loadProfile();
-setInterval(updateTimer, 1000);
-
 </script>
+
 </body>
 </html>
