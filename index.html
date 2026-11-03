@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Together - TON Rewards</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#081323;color:white;
+ font-family:Arial,sans-serif;text-align:center;
+}
+header{padding:25px;background:#102541}
+h1{color:#48b9f5;margin:0}
+.container{max-width:440px;margin:auto;padding:20px}
+.card{
+ background:#142a46;border-radius:20px;
+ padding:22px;margin:18px 0;
+ border:1px solid #284666;
+}
+.balance{font-size:27px;color:#45c4ff;font-weight:bold}
+button{
+ width:100%;padding:16px;border:0;
+ border-radius:13px;margin-top:12px;
+ background:#229ed9;color:white;
+ font-size:17px;font-weight:bold;
+}
+button:disabled{opacity:.5}
+.secondary{background:#1e4267}
+small{color:#a8bed5}
+.stats{display:flex;justify-content:space-around}
+nav{display:flex;justify-content:space-around;
+ padding:20px;background:#102541}
+</style>
+</head>
+<body>
+<header>
+<h1>💎 APP TOGETHER</h1>
+<p>TON Rewards</p>
+</header>
+<div class="container">
+<div class="card">
+<p>إجمالي رصيدك</p>
+<div class="balance" id="balance">0.000000000 TON</div>
+<small>رصيد المكافآت التجريبي</small>
+</div>
+<div class="card">
+<h3>⛏️ التعدين اليومي</h3>
+<div class="balance">0.0000595 TON</div>
+<button id="mine" onclick="mine()">ابدأ التعدين اليومي</button>
+<p id="mineStatus">متاح لك جمع مكافأة يومية</p>
+</div>
+<div class="card">
+<h3>🎬 شاهد إعلانًا واكسب</h3>
+<div class="balance">+0.000000010 TON</div>
+<button class="secondary" onclick="watchAd()">
+مشاهدة إعلان
+</button>
+<p id="adStatus">عدد الإعلانات: 0</p>
+</div>
+<div class="card">
+<h3>📊 إحصائياتك</h3>
+<div class="stats">
+<div>الإعلانات<br><b id="ads">0</b></div>
+<div>المكافآت<br><b id="rewards">0</b></div>
+</div>
+</div>
+<div class="card">
+<h3>👛 محفظة TON</h3>
+<input id="wallet" placeholder="أدخل عنوان محفظة TON"
+style="width:100%;padding:14px;border-radius:10px;border:0">
+<button class="secondary" onclick="saveWallet()">حفظ المحفظة</button>
+<button class="secondary" onclick="withdraw()">طلب سحب</button>
+<p id="walletStatus"></p>
+</div>
+</div>
+<nav>
+<span>🏠 الرئيسية</span>
+<span>💎 التعدين</span>
+<span>👛 المحفظة</span>
+</nav>
+<script>
+let balance=0;
+let ads=0;
+let rewards=0;
+let lastMine=0;
+
+function update(){
+ document.getElementById('balance').textContent=
+ balance.toFixed(9)+' TON';
+ document.getElementById('ads').textContent=ads;
+ document.getElementById('rewards').textContent=rewards;
+ document.getElementById('adStatus').textContent=
+ 'عدد الإعلانات: '+ads;
+}
+
+function mine(){
+ if(Date.now()-lastMine<86400000){
+ alert('لقد حصلت على مكافأة اليوم بالفعل');
+ return;
+ }
+ balance+=0.0000595;
+ lastMine=Date.now();
+ document.getElementById('mineStatus').textContent=
+ 'تم تسجيل المكافأة التجريبية بنجاح';
+ update();
+}
+
+function watchAd(){
+ alert('هذه نسخة تجريبية. لم يتم عرض إعلان حقيقي ولم تُمنح مكافأة.');
+}
+
+function saveWallet(){
+ const wallet=document.getElementById('wallet').value.trim();
+ if(!wallet){alert('أدخل عنوان المحفظة');return;}
+ document.getElementById('walletStatus').textContent=
+ 'تم إدخال العنوان في هذه النسخة التجريبية فقط';
+}
+
+function withdraw(){
+ alert('السحب غير متاح حتى ربط خادم المكافآت والمحفظة.');
+}
+update();
+</script>
+</body>
+</html>
