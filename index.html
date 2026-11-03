@@ -18,80 +18,61 @@ body{
   text-align:center;
 }
 header{
-  padding:25px 15px;
+  padding:30px 15px;
   background:#102641;
-  border-bottom:1px solid #25415f;
 }
 .logo{
   color:#42c9ff;
-  font-size:27px;
+  font-size:28px;
   font-weight:bold;
 }
-header p{color:#a9bad0;font-size:13px}
-.container{max-width:460px;margin:auto;padding:20px 15px}
+.container{
+  max-width:450px;
+  margin:auto;
+  padding:25px 18px;
+}
 .page{display:none}
 .page.active{display:block}
 .card{
   background:#11233b;
-  border:1px solid #203b5d;
-  border-radius:18px;
-  padding:25px 18px;
-  margin-bottom:17px;
+  border:1px solid #25415f;
+  border-radius:20px;
+  padding:30px 18px;
+  margin-top:25px;
 }
 h2{color:#42c9ff}
 p{color:#b5c6da;line-height:1.8}
 button{
-  border:0;
-  border-radius:12px;
-  padding:15px;
   width:100%;
-  margin:8px 0;
-  color:white;
+  padding:17px;
+  border:0;
+  border-radius:13px;
   background:#159bd3;
-  font-size:16px;
+  color:white;
+  font-size:17px;
   font-weight:bold;
   cursor:pointer;
+  margin-top:15px;
 }
-button:active{transform:scale(.98)}
-.secondary{background:#203b5d}
-.ad-slot{
+.back{
+  background:#203b5d;
+}
+.ad-area{
   min-height:180px;
   border:2px dashed #41617f;
-  border-radius:14px;
-  margin:20px 0;
-  padding:20px 10px;
+  border-radius:15px;
+  margin-top:25px;
+  padding:20px;
   display:flex;
   align-items:center;
   justify-content:center;
   color:#91a8c1;
   line-height:1.8;
 }
-.message{
-  color:#ffd166;
-  font-size:13px;
-  line-height:1.7;
-}
-nav{
-  position:sticky;
-  bottom:0;
-  background:#102641;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 5px;
-  border-top:1px solid #25415f;
-}
-nav button{
-  width:32%;
-  margin:0;
-  padding:12px 5px;
-  font-size:13px;
-  background:#203b5d;
-}
-nav button.selected{background:#159bd3}
 footer{
   color:#71869e;
   font-size:12px;
-  padding:20px;
+  padding:25px;
 }
 </style>
 </head>
@@ -100,86 +81,57 @@ footer{
 
 <header>
   <div class="logo">APP TOGETHER 🚀</div>
-  <p>استمتع بالإعلانات وكن جزءًا من مجتمعنا</p>
+  <p>Welcome To App Together</p>
 </header>
 
 <div class="container">
 
-  <!-- الصفحة الرئيسية -->
+  <!-- الرئيسية -->
   <section class="page active" id="home">
     <div class="card">
-      <h2>أهلاً بيك في App Together ❤️</h2>
-      <p>
-        أهلاً بيك في تطبيقنا!
-        تقدر تدخل صفحات الإعلانات من هنا.
-      </p>
-      <button onclick="showPage('ad1')">
-        🎬 الإعلان الأول
+      <h2>أهلاً بيك ❤️</h2>
+      <p>اضغط ابدأ وانتقل إلى الإعلانات.</p>
+      <button onclick="showPage('page2')">ابدأ</button>
+    </div>
+  </section>
+
+  <!-- الصفحة الثانية -->
+  <section class="page" id="page2">
+    <div class="card">
+      <div class="ad-area" id="ad-area-1">
+        مكان الإعلان
+      </div>
+
+      <button onclick="showAdMessage()">
+        إضغط لمشاهدة الإعلان
       </button>
-      <button onclick="showPage('ad2')">
-        🎬 الإعلان الثاني
+
+      <button class="back" onclick="showPage('page3')">
+        التالي
       </button>
     </div>
   </section>
 
-  <!-- صفحة الإعلان الأول -->
-  <section class="page" id="ad1">
+  <!-- الصفحة الثالثة -->
+  <section class="page" id="page3">
     <div class="card">
-      <h2>🎧 الإعلان الأول</h2>
-      <p>اضغط لمشاهدة الإعلان.</p>
-
-      <div class="ad-slot" id="ad-slot-1">
-        مكان الإعلان الأول<br>
-        سيتم عرض الإعلان هنا بعد إضافة كود Monetag
+      <div class="ad-area" id="ad-area-2">
+        مكان الإعلان
       </div>
 
-      <button onclick="adNotice()">
-        ▶ إضغط لمشاهدة الإعلان
+      <button onclick="showAdMessage()">
+        إضغط لمشاهدة الإعلان
       </button>
 
-      <div class="message" id="message1"></div>
-    </div>
-    <button class="secondary" onclick="showPage('home')">
-      العودة للرئيسية
-    </button>
-  </section>
-
-  <!-- صفحة الإعلان الثاني -->
-  <section class="page" id="ad2">
-    <div class="card">
-      <h2>🎧 الإعلان الثاني</h2>
-      <p>اضغط لمشاهدة الإعلان.</p>
-
-      <div class="ad-slot" id="ad-slot-2">
-        مكان الإعلان الثاني<br>
-        سيتم عرض الإعلان هنا بعد إضافة كود Monetag
-      </div>
-
-      <button onclick="adNotice()">
-        ▶ إضغط لمشاهدة الإعلان
+      <button class="back" onclick="showPage('page2')">
+        السابق
       </button>
-
-      <div class="message" id="message2"></div>
     </div>
-    <button class="secondary" onclick="showPage('home')">
-      العودة للرئيسية
-    </button>
   </section>
 
 </div>
 
-<nav>
-  <button id="nav-home" class="selected"
-    onclick="showPage('home')">🏠 الرئيسية</button>
-  <button id="nav-ad1"
-    onclick="showPage('ad1')">🎬 إعلان 1</button>
-  <button id="nav-ad2"
-    onclick="showPage('ad2')">🎬 إعلان 2</button>
-</nav>
-
-<footer>
-  App Together © 2026
-</footer>
+<footer>App Together © 2026</footer>
 
 <script>
 if(window.Telegram && window.Telegram.WebApp){
@@ -187,25 +139,17 @@ if(window.Telegram && window.Telegram.WebApp){
   Telegram.WebApp.expand();
 }
 
-function showPage(pageId){
+function showPage(id){
   document.querySelectorAll('.page').forEach(page=>{
     page.classList.remove('active');
   });
 
-  document.getElementById(pageId).classList.add('active');
-
-  document.querySelectorAll('nav button').forEach(btn=>{
-    btn.classList.remove('selected');
-  });
-
-  document.getElementById('nav-'+pageId)
-    .classList.add('selected');
-
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
 }
 
-function adNotice(){
-  alert('الإعلانات لم يتم ربطها بعد. أضف كود Monetag أولاً.');
+function showAdMessage(){
+  alert('سيتم تفعيل الإعلان بعد ربط Monetag.');
 }
 </script>
 
