@@ -2,274 +2,518 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#081323">
-<title>App Together - TON Mining</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081323">
+  <title>App Together - TON Mining</title>
 
-<style>
-*{box-sizing:border-box}
-body{
- margin:0;background:#081323;color:white;
- font-family:Arial,sans-serif;text-align:center;
-}
-header{padding:24px;background:#102541}
-h1{color:#48b9f5;margin:0}
-.container{max-width:440px;margin:auto;padding:18px}
-.card{
- background:#142a46;border-radius:20px;
- padding:22px;margin:16px 0;
- border:1px solid #284666;
-}
-.balance{
- font-size:25px;color:#45c4ff;
- font-weight:bold;direction:ltr;
-}
-.timer{
- font-size:32px;color:#45c4ff;
- font-weight:bold;direction:ltr;margin:18px;
-}
-button{
- width:100%;padding:15px;border:0;
- border-radius:13px;margin-top:12px;
- background:#229ed9;color:white;
- font-size:17px;font-weight:bold;
-}
-button:disabled{opacity:.5}
-.secondary{background:#1e4267}
-small{color:#a8bed5}
-.stats{display:flex;gap:10px}
-.stat{
- flex:1;background:#0d2038;
- padding:14px;border-radius:12px;
-}
-input{
- width:100%;padding:14px;
- border-radius:10px;border:0;margin-top:10px;
-}
-</style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px 15px;
+      background: #081323;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 460px;
+      margin: auto;
+    }
+
+    .header {
+      margin: 15px 0 25px;
+    }
+
+    .logo {
+      font-size: 29px;
+      font-weight: bold;
+      color: #42c9ff;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: #9aabc2;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: #11233b;
+      border: 1px solid #203b5d;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 15px;
+    }
+
+    .balance-label {
+      color: #a9bad0;
+      font-size: 15px;
+    }
+
+    .balance {
+      color: #42c9ff;
+      font-size: 35px;
+      font-weight: bold;
+      margin: 12px 0;
+      direction: ltr;
+    }
+
+    .unit {
+      color: #a9bad0;
+      font-size: 14px;
+    }
+
+    .status {
+      color: #42c9ff;
+      font-size: 14px;
+      margin: 12px 0;
+    }
+
+    .timer {
+      font-size: 25px;
+      font-weight: bold;
+      direction: ltr;
+      margin: 15px 0;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 13px;
+      padding: 15px;
+      margin-top: 10px;
+      background: #159bd3;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      background: #203b5d;
+    }
+
+    .green {
+      background: #168b65;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      background: #0b1a2d;
+      border-radius: 12px;
+      padding: 15px 8px;
+    }
+
+    .stat-number {
+      color: #42c9ff;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      color: #a9bad0;
+      font-size: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #29496d;
+      background: #081323;
+      color: white;
+      margin-top: 12px;
+      text-align: left;
+      direction: ltr;
+      outline: none;
+    }
+
+    .note {
+      color: #91a4bd;
+      font-size: 12px;
+      line-height: 1.8;
+      margin-top: 15px;
+    }
+
+    .message {
+      color: #ffd166;
+      font-size: 13px;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .error {
+      color: #ff7777;
+    }
+
+    .footer {
+      color: #60758e;
+      font-size: 12px;
+      margin: 25px 0 10px;
+    }
+  </style>
 </head>
 
 <body>
-<header>
-<h1>💎 APP TOGETHER</h1>
-<p>TON Mining Rewards</p>
-</header>
-
 <div class="container">
 
-<div class="card">
-<p>إجمالي رصيدك</p>
-<div class="balance" id="balance">0.000000000 TON</div>
-<small>رصيد تجريبي</small>
-</div>
+  <div class="header">
+    <div class="logo">APP TOGETHER</div>
+    <div class="subtitle">Together We Grow 🚀</div>
+  </div>
 
-<div class="card">
-<h3>⛏️ التعدين اليومي</h3>
-<div class="balance">+0.000059500 TON</div>
-<p id="status">ابدأ التعدين واجمع مكافأتك بعد 12 ساعة</p>
-<div class="timer" id="timer">12:00:00</div>
-<button id="mineButton" onclick="startMining()">
-ابدأ التعدين
-</button>
-</div>
+  <div class="card">
+    <div class="balance-label">رصيدك التجريبي</div>
+    <div class="balance" id="balance">0.00000000</div>
+    <div class="unit">TON</div>
 
-<div class="card">
-<h3>🎬 شاهد إعلانًا واكسب</h3>
-<div class="balance">+0.000000010 TON</div>
-<button class="secondary" onclick="watchAd()">
-مشاهدة إعلان
-</button>
-<p id="adStatus">الإعلانات غير مربوطة بعد</p>
-</div>
+    <div class="status" id="status">جاري الاتصال...</div>
 
-<div class="card">
-<h3>📊 إحصائياتك</h3>
-<div class="stats">
-<div class="stat">
-الإعلانات<br><b id="ads">0</b>
-</div>
-<div class="stat">
-مرات التعدين المكتملة<br><b id="cycles">0</b>
-</div>
-</div>
-</div>
+    <div class="timer" id="timer">12:00:00</div>
 
-<div class="card">
-<h3>👛 محفظة TON</h3>
-<input id="wallet" placeholder="أدخل عنوان محفظة TON">
-<button class="secondary" onclick="saveWallet()">
-حفظ المحفظة
-</button>
-<button class="secondary" onclick="withdraw()">
-طلب سحب
-</button>
-<p id="walletStatus"></p>
-</div>
+    <button id="mineButton" disabled>
+      جاري تحميل الحساب...
+    </button>
+
+    <div class="message" id="mainMessage"></div>
+  </div>
+
+  <div class="card">
+    <h3>📊 إحصائياتك</h3>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number" id="cycles">0</div>
+        <div class="stat-label">دورات مكتملة</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="ads">0</div>
+        <div class="stat-label">الإعلانات المشاهدة</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🎬 الإعلانات</h3>
+    <p class="note">
+      شاهد الإعلانات بعد تفعيل شبكة الإعلانات وربطها بالتطبيق.
+    </p>
+    <button class="green" id="adButton">
+      مشاهدة إعلان
+    </button>
+    <div class="message" id="adMessage"></div>
+  </div>
+
+  <div class="card">
+    <h3>👛 محفظة TON</h3>
+    <input
+      id="wallet"
+      type="text"
+      placeholder="أدخل عنوان محفظة TON"
+      autocomplete="off"
+    >
+    <button class="secondary" id="saveWallet">
+      حفظ عنوان المحفظة
+    </button>
+    <div class="message" id="walletMessage"></div>
+
+    <p class="note">
+      حفظ العنوان لا يعني أن السحب متاح. لا توجد مدفوعات حقيقية مفعّلة حاليًا.
+    </p>
+  </div>
+
+  <div class="footer">
+    App Together © 2026
+    <br>
+    نظام تجريبي للمكافآت وليس تعدين TON حقيقيًا.
+  </div>
 
 </div>
 
 <script>
+"use strict";
 
-const tg = window.Telegram?.WebApp;
-const API_URL = "https://sqtnsimqusjmkgutocvm.supabase.co/functions/v1/ton-mining";
+/* إعدادات الاتصال */
+const API_URL =
+  "https://sqtnsimqusjmkgutocvm.supabase.co/functions/v1/ton-mining";
 
-// ضع Supabase anon public key هنا
+/* ضع مفتاح Supabase العام هنا */
 const SUPABASE_ANON_KEY = "sb_publishable_g1rWdUnCyy7tOUs3CyHm1A_aX_BYpeN";
 
-const DURATION = 12 * 60 * 60 * 1000;
 const REWARD = 0.0000595;
+const CYCLE_TIME = 12 * 60 * 60 * 1000;
+
+const tg = window.Telegram?.WebApp;
 
 let profile = null;
+let busy = false;
 let completing = false;
-let ads = Number(localStorage.getItem("ton_ads") || 0);
-let wallet = localStorage.getItem("ton_wallet") || "";
+let completedAttempted = false;
 
+/* عناصر الصفحة */
+const balanceEl = document.getElementById("balance");
+const statusEl = document.getElementById("status");
+const timerEl = document.getElementById("timer");
+const mineButton = document.getElementById("mineButton");
+const cyclesEl = document.getElementById("cycles");
+const mainMessage = document.getElementById("mainMessage");
+
+/* تهيئة تيليجرام */
 if (tg) {
   tg.ready();
   tg.expand();
 }
 
-document.getElementById("wallet").value = wallet;
+/* عرض الرسائل */
+function showMessage(element, message, isError = false) {
+  element.textContent = message;
+  element.className = isError
+    ? "message error"
+    : "message";
+}
 
+/* الاتصال بالسيرفر */
 async function api(action) {
-  if (!tg?.initData) {
-    throw new Error("افتح التطبيق من داخل بوت Telegram");
+  if (!tg || !tg.initData) {
+    throw new Error("افتح التطبيق من داخل بوت تيليجرام.");
+  }
+
+  if (
+    !SUPABASE_ANON_KEY ||
+    SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY"
+  ) {
+    throw new Error("مفتاح Supabase العام غير موجود في الكود.");
   }
 
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "apikey": SUPABASE_ANON_KEY
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY
     },
     body: JSON.stringify({
-      action,
+      action: action,
       initData: tg.initData
     })
   });
 
-  const data = await response.json();
+  const result = await response.json().catch(() => ({}));
 
-  if (!response.ok || data.error) {
-    throw new Error(data.error || "حدث خطأ في الاتصال");
+  if (!response.ok) {
+    throw new Error(
+      result.error || result.message ||
+      "فشل الاتصال بالسيرفر. رمز الخطأ: " + response.status
+    );
   }
 
-  return data;
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result;
 }
 
-function update() {
+/* قراءة بيانات الحساب */
+function getProfileFromResult(result) {
+  return result.profile || result.data?.profile || null;
+}
+
+/* تحديث الرصيد */
+function updateBalance() {
   if (!profile) return;
 
-  document.getElementById("balance").textContent =
-    Number(profile.Balance || 0).toFixed(9) + " TON";
+  const balance = Number(profile.Balance || 0);
+  balanceEl.textContent = balance.toFixed(8);
 
-  document.getElementById("cycles").textContent =
-    profile["Mining-cycles"] || 0;
-
-  document.getElementById("ads").textContent = ads;
+  cyclesEl.textContent =
+    Number(profile["Mining-cycles"] || 0);
 }
 
+/* تحميل الحساب */
 async function loadProfile() {
+  mineButton.disabled = true;
+  mineButton.textContent = "جاري تحميل الحساب...";
+  statusEl.textContent = "جاري الاتصال بالسيرفر...";
+  showMessage(mainMessage, "");
+
   try {
-    document.getElementById("status").textContent =
-      "جاري تحميل حسابك...";
+    const result = await api("status");
 
-    const data = await api("status");
-
-    if (data.status !== "ok") {
-      throw new Error("حسابك غير موجود في قاعدة البيانات");
+    if (result.status !== "ok") {
+      throw new Error(
+        result.message ||
+        "الحساب غير موجود في جدول profiles."
+      );
     }
 
-    profile = data.profile;
-    update();
+    profile = getProfileFromResult(result);
+
+    if (!profile) {
+      throw new Error("السيرفر لم يرجع بيانات الحساب.");
+    }
+
+    updateBalance();
     updateTimer();
 
   } catch (error) {
-    document.getElementById("status").textContent =
-      error.message;
+    profile = null;
+    statusEl.textContent = "تعذر تحميل الحساب";
+    mineButton.textContent = "إعادة المحاولة";
+    mineButton.disabled = false;
+
+    showMessage(
+      mainMessage,
+      error.message,
+      true
+    );
+
+    mineButton.onclick = () => loadProfile();
   }
 }
 
+/* بدء دورة التعدين */
 async function startMining() {
-  try {
-    const button = document.getElementById("mineButton");
-    button.disabled = true;
+  if (busy || !profile) return;
 
+  busy = true;
+  mineButton.disabled = true;
+  mineButton.textContent = "جاري بدء التعدين...";
+
+  try {
     const result = await api("start");
 
+    const data = result.data || result;
+
     if (
-      result.status !== "started" &&
-      result.status !== "already_running"
+      data.status === "started" ||
+      data.status === "already_running"
     ) {
-      throw new Error("تعذر بدء التعدين");
-    }
+      showMessage(
+        mainMessage,
+        data.status === "started"
+          ? "بدأت دورة التعدين بنجاح 🚀"
+          : "لديك دورة تعدين قيد التشغيل بالفعل."
+      );
 
-    await loadProfile();
-
-  } catch (error) {
-    alert(error.message);
-    document.getElementById("mineButton").disabled = false;
-  }
-}
-
-async function completeMining() {
-  if (completing) return;
-
-  completing = true;
-
-  try {
-    document.getElementById("status").textContent =
-      "جاري التحقق من اكتمال التعدين...";
-
-    const result = await api("complete");
-
-    if (result.status === "completed") {
       await loadProfile();
-      alert("🎉 تمت إضافة مكافأة التعدين التجريبية!");
+
     } else {
-      await loadProfile();
+      throw new Error(
+        data.message ||
+        data.status ||
+        "لم نتمكن من بدء التعدين."
+      );
     }
 
   } catch (error) {
-    document.getElementById("status").textContent =
-      error.message;
+    showMessage(mainMessage, error.message, true);
+    mineButton.disabled = false;
+    mineButton.textContent = "حاول مرة أخرى";
   } finally {
-    completing = false;
+    busy = false;
     updateTimer();
   }
 }
 
-function updateTimer() {
-  const timer = document.getElementById("timer");
-  const button = document.getElementById("mineButton");
-  const status = document.getElementById("status");
+/* إنهاء الدورة وإضافة المكافأة */
+async function completeMining() {
+  if (busy || completing || !profile) return;
 
-  if (!profile) {
-    button.disabled = true;
-    return;
+  completing = true;
+  busy = true;
+  mineButton.disabled = true;
+  mineButton.textContent = "جاري إضافة المكافأة...";
+
+  try {
+    const result = await api("complete");
+    const data = result.data || result;
+
+    if (data.status === "completed") {
+      completedAttempted = false;
+
+      showMessage(
+        mainMessage,
+        "اكتملت الدورة وتم تحديث رصيدك بنجاح 🎉"
+      );
+
+      await loadProfile();
+
+    } else {
+      throw new Error(
+        data.message ||
+        data.status ||
+        "لم تكتمل الدورة."
+      );
+    }
+
+  } catch (error) {
+    showMessage(mainMessage, error.message, true);
+    mineButton.disabled = false;
+    mineButton.textContent = "إعادة محاولة استلام المكافأة";
+  } finally {
+    completing = false;
+    busy = false;
+    updateTimer();
   }
+}
+
+/* حساب الوقت المتبقي */
+function updateTimer() {
+  if (!profile) return;
 
   const startedAt = profile["Mining started at"];
 
   if (!startedAt) {
-    timer.textContent = "12:00:00";
-    status.textContent = "ابدأ التعدين واجمع مكافأتك بعد 12 ساعة";
-    button.textContent = "ابدأ التعدين";
-    button.disabled = false;
+    timerEl.textContent = "12:00:00";
+    statusEl.textContent = "جاهز لبدء دورة جديدة";
+    mineButton.textContent = "🚀 ابدأ التعدين";
+    mineButton.disabled = busy;
+    mineButton.onclick = startMining;
+    completedAttempted = false;
     return;
   }
 
-  const remaining =
-    DURATION - (Date.now() - Date.parse(startedAt));
+  const startTime = new Date(startedAt).getTime();
+
+  if (!Number.isFinite(startTime)) {
+    statusEl.textContent = "تاريخ بدء الدورة غير صحيح";
+    mineButton.disabled = true;
+    return;
+  }
+
+  const remaining = CYCLE_TIME - (Date.now() - startTime);
 
   if (remaining <= 0) {
-    timer.textContent = "00:00:00";
-    button.disabled = true;
-    button.textContent = "جاري استلام المكافأة...";
-    status.textContent = "اكتمل الوقت، جاري التحقق";
-    completeMining();
+    timerEl.textContent = "00:00:00";
+    statusEl.textContent = "اكتملت مدة الدورة";
+
+    mineButton.textContent = "استلام المكافأة";
+    mineButton.onclick = completeMining;
+    mineButton.disabled = busy;
+
+    if (!completedAttempted && !busy) {
+      completedAttempted = true;
+      completeMining();
+    }
+
     return;
   }
 
@@ -277,37 +521,66 @@ function updateTimer() {
   const minutes = Math.floor((remaining % 3600000) / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
 
-  timer.textContent =
+  timerEl.textContent =
     String(hours).padStart(2, "0") + ":" +
     String(minutes).padStart(2, "0") + ":" +
     String(seconds).padStart(2, "0");
 
-  status.textContent = "⛏️ التعدين مستمر...";
-  button.disabled = true;
-  button.textContent = "التعدين جارٍ...";
+  statusEl.textContent = "التعدين قيد التشغيل ⛏️";
+  mineButton.textContent = "التعدين يعمل...";
+  mineButton.disabled = true;
 }
 
-function watchAd() {
-  alert("الإعلانات لم تُربط بعد. لن تتم إضافة مكافأة قبل التحقق من الإعلان.");
-}
+/* زر الإعلانات */
+document.getElementById("adButton").addEventListener("click", () => {
+  showMessage(
+    document.getElementById("adMessage"),
+    "الإعلانات لم يتم ربطها بعد. نحتاج كود وحدة Monetag الخاصة بك."
+  );
+});
 
-function saveWallet() {
-  wallet = document.getElementById("wallet").value.trim();
+/* حفظ المحفظة محليًا */
+const walletInput = document.getElementById("wallet");
+
+walletInput.value =
+  localStorage.getItem("app_together_wallet") || "";
+
+document.getElementById("saveWallet").addEventListener("click", () => {
+  const wallet = walletInput.value.trim();
 
   if (!wallet) {
-    alert("أدخل عنوان محفظة TON");
+    showMessage(
+      document.getElementById("walletMessage"),
+      "اكتب عنوان المحفظة أولًا.",
+      true
+    );
     return;
   }
 
-  localStorage.setItem("ton_wallet", wallet);
+  localStorage.setItem("app_together_wallet", wallet);
 
-  document.getElementById("walletStatus").textContent =
-    "تم حفظ عنوان المحفظة على هذا الجهاز";
-}
+  showMessage(
+    document.getElementById("walletMessage"),
+    "تم حفظ عنوان المحفظة على هذا الجهاز."
+  );
+});
 
-function withdraw() {
-  alert("السحب غير متاح حاليًا.");
-}
+/* عدد الإعلانات المحفوظ محليًا */
+document.getElementById("ads").textContent =
+  localStorage.getItem("app_together_ads") || "0";
+
+/* تشغيل التطبيق */
+mineButton.addEventListener("click", () => {
+  if (!profile) {
+    loadProfile();
+  } else {
+    startMining();
+  }
+});
 
 loadProfile();
 setInterval(updateTimer, 1000);
+
+</script>
+</body>
+</html>
