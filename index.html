@@ -4,24 +4,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>App Together - TON Rewards</title>
+<meta name="theme-color" content="#081323">
+<title>App Together - TON Mining</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 *{box-sizing:border-box}
 body{
  margin:0;background:#081323;color:white;
  font-family:Arial,sans-serif;text-align:center;
 }
-header{padding:25px;background:#102541}
+header{padding:24px;background:#102541}
 h1{color:#48b9f5;margin:0}
-.container{max-width:440px;margin:auto;padding:20px}
+.container{max-width:440px;margin:auto;padding:18px}
 .card{
  background:#142a46;border-radius:20px;
- padding:22px;margin:18px 0;
+ padding:22px;margin:16px 0;
  border:1px solid #284666;
 }
-.balance{font-size:27px;color:#45c4ff;font-weight:bold}
+.balance{
+ font-size:25px;color:#45c4ff;
+ font-weight:bold;direction:ltr;
+}
+.timer{
+ font-size:32px;color:#45c4ff;
+ font-weight:bold;direction:ltr;margin:18px;
+}
 button{
- width:100%;padding:16px;border:0;
+ width:100%;padding:15px;border:0;
  border-radius:13px;margin-top:12px;
  background:#229ed9;color:white;
  font-size:17px;font-weight:bold;
@@ -29,99 +39,206 @@ button{
 button:disabled{opacity:.5}
 .secondary{background:#1e4267}
 small{color:#a8bed5}
-.stats{display:flex;justify-content:space-around}
-nav{display:flex;justify-content:space-around;
- padding:20px;background:#102541}
+.stats{display:flex;gap:10px}
+.stat{
+ flex:1;background:#0d2038;
+ padding:14px;border-radius:12px;
+}
+input{
+ width:100%;padding:14px;
+ border-radius:10px;border:0;margin-top:10px;
+}
 </style>
 </head>
+
 <body>
 <header>
 <h1>💎 APP TOGETHER</h1>
-<p>TON Rewards</p>
+<p>TON Mining Rewards</p>
 </header>
+
 <div class="container">
+
 <div class="card">
 <p>إجمالي رصيدك</p>
 <div class="balance" id="balance">0.000000000 TON</div>
-<small>رصيد المكافآت التجريبي</small>
+<small>رصيد تجريبي</small>
 </div>
+
 <div class="card">
 <h3>⛏️ التعدين اليومي</h3>
-<div class="balance">0.0000595 TON</div>
-<button id="mine" onclick="mine()">ابدأ التعدين اليومي</button>
-<p id="mineStatus">متاح لك جمع مكافأة يومية</p>
+<div class="balance">+0.000059500 TON</div>
+<p id="status">ابدأ التعدين واجمع مكافأتك بعد 12 ساعة</p>
+<div class="timer" id="timer">12:00:00</div>
+<button id="mineButton" onclick="startMining()">
+ابدأ التعدين
+</button>
 </div>
+
 <div class="card">
 <h3>🎬 شاهد إعلانًا واكسب</h3>
 <div class="balance">+0.000000010 TON</div>
 <button class="secondary" onclick="watchAd()">
 مشاهدة إعلان
 </button>
-<p id="adStatus">عدد الإعلانات: 0</p>
+<p id="adStatus">الإعلانات غير مربوطة بعد</p>
 </div>
+
 <div class="card">
 <h3>📊 إحصائياتك</h3>
 <div class="stats">
-<div>الإعلانات<br><b id="ads">0</b></div>
-<div>المكافآت<br><b id="rewards">0</b></div>
+<div class="stat">
+الإعلانات<br><b id="ads">0</b>
+</div>
+<div class="stat">
+مرات التعدين المكتملة<br><b id="cycles">0</b>
 </div>
 </div>
+</div>
+
 <div class="card">
 <h3>👛 محفظة TON</h3>
-<input id="wallet" placeholder="أدخل عنوان محفظة TON"
-style="width:100%;padding:14px;border-radius:10px;border:0">
-<button class="secondary" onclick="saveWallet()">حفظ المحفظة</button>
-<button class="secondary" onclick="withdraw()">طلب سحب</button>
+<input id="wallet" placeholder="أدخل عنوان محفظة TON">
+<button class="secondary" onclick="saveWallet()">
+حفظ المحفظة
+</button>
+<button class="secondary" onclick="withdraw()">
+طلب سحب
+</button>
 <p id="walletStatus"></p>
 </div>
-</div>
-<nav>
-<span>🏠 الرئيسية</span>
-<span>💎 التعدين</span>
-<span>👛 المحفظة</span>
-</nav>
-<script>
-let balance=0;
-let ads=0;
-let rewards=0;
-let lastMine=0;
 
-function update(){
- document.getElementById('balance').textContent=
- balance.toFixed(9)+' TON';
- document.getElementById('ads').textContent=ads;
- document.getElementById('rewards').textContent=rewards;
- document.getElementById('adStatus').textContent=
- 'عدد الإعلانات: '+ads;
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+
+if(tg){
+ tg.ready();
+ tg.expand();
 }
 
-function mine(){
- if(Date.now()-lastMine<86400000){
- alert('لقد حصلت على مكافأة اليوم بالفعل');
- return;
+const DURATION = 12 * 60 * 60 * 1000;
+const REWARD = 0.0000595;
+
+let balance = Number(localStorage.getItem("ton_balance") || 0);
+let cycles = Number(localStorage.getItem("ton_cycles") || 0);
+let ads = Number(localStorage.getItem("ton_ads") || 0);
+let start = Number(localStorage.getItem("ton_start") || 0);
+let wallet = localStorage.getItem("ton_wallet") || "";
+
+document.getElementById("wallet").value = wallet;
+
+function saveData(){
+ localStorage.setItem("ton_balance",balance);
+ localStorage.setItem("ton_cycles",cycles);
+ localStorage.setItem("ton_ads",ads);
+ localStorage.setItem("ton_start",start);
+}
+
+function update(){
+ document.getElementById("balance").textContent =
+ balance.toFixed(9)+" TON";
+
+ document.getElementById("cycles").textContent=cycles;
+ document.getElementById("ads").textContent=ads;
+}
+
+function startMining(){
+ if(start){
+  alert("لديك دورة تعدين قيد التشغيل بالفعل");
+  return;
  }
- balance+=0.0000595;
- lastMine=Date.now();
- document.getElementById('mineStatus').textContent=
- 'تم تسجيل المكافأة التجريبية بنجاح';
+
+ start=Date.now();
+ saveData();
+ updateTimer();
+}
+
+function completeMining(){
+ // إنهاء الدورة قبل إضافة المكافأة لمنع تكرارها
+ start=0;
+ balance+=REWARD;
+ cycles++;
+
+ saveData();
  update();
+
+ document.getElementById("timer").textContent="00:00:00";
+ document.getElementById("status").textContent=
+ "🎉 اكتملت الدورة! تمت إضافة المكافأة التجريبية";
+
+ const button=document.getElementById("mineButton");
+ button.disabled=false;
+ button.textContent="ابدأ دورة جديدة";
+}
+
+function updateTimer(){
+ const timer=document.getElementById("timer");
+ const button=document.getElementById("mineButton");
+ const status=document.getElementById("status");
+
+ if(!start){
+  if(cycles>0){
+   timer.textContent="00:00:00";
+   status.textContent="🎉 مكافأتك السابقة اكتملت! يمكنك بدء دورة جديدة";
+   button.textContent="ابدأ دورة جديدة";
+  }else{
+   timer.textContent="12:00:00";
+   status.textContent="ابدأ التعدين واجمع مكافأتك بعد 12 ساعة";
+   button.textContent="ابدأ التعدين";
+  }
+
+  button.disabled=false;
+  return;
+ }
+
+ const remaining=DURATION-(Date.now()-start);
+
+ if(remaining<=0){
+  completeMining();
+  return;
+ }
+
+ const hours=Math.floor(remaining/3600000);
+ const minutes=Math.floor((remaining%3600000)/60000);
+ const seconds=Math.floor((remaining%60000)/1000);
+
+ timer.textContent=
+ String(hours).padStart(2,"0")+":"+
+ String(minutes).padStart(2,"0")+":"+
+ String(seconds).padStart(2,"0");
+
+ button.disabled=true;
+ button.textContent="التعدين جارٍ...";
+ status.textContent="⛏️ التعدين مستمر، انتظر اكتمال الوقت";
 }
 
 function watchAd(){
- alert('هذه نسخة تجريبية. لم يتم عرض إعلان حقيقي ولم تُمنح مكافأة.');
+ alert("الإعلانات لم تُربط بعد. لا توجد مكافأة فعلية قبل التحقق من مشاهدة إعلان حقيقي.");
 }
 
 function saveWallet(){
- const wallet=document.getElementById('wallet').value.trim();
- if(!wallet){alert('أدخل عنوان المحفظة');return;}
- document.getElementById('walletStatus').textContent=
- 'تم إدخال العنوان في هذه النسخة التجريبية فقط';
+ wallet=document.getElementById("wallet").value.trim();
+
+ if(!wallet){
+  alert("من فضلك أدخل عنوان المحفظة");
+  return;
+ }
+
+ localStorage.setItem("ton_wallet",wallet);
+
+ document.getElementById("walletStatus").textContent=
+ "تم حفظ العنوان تجريبيًا على هذا الجهاز";
 }
 
 function withdraw(){
- alert('السحب غير متاح حتى ربط خادم المكافآت والمحفظة.');
+ alert("السحب غير متاح حاليًا. سيتم تفعيله بعد ربط الخادم ومحفظة TON.");
 }
+
 update();
+updateTimer();
+setInterval(updateTimer,1000);
 </script>
 </body>
 </html>
